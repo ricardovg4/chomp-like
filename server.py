@@ -65,7 +65,6 @@ while player_number <= 2:
         target=handle_client, args=(conn, clients, addr))
     client_handler.start()
 
-
     player_number += 1
 
     if (player_number > 2):

@@ -17,7 +17,13 @@ running = True
 # Initialize window
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 pygame.display.set_caption("Chomp")
-font = pygame.font.Font(None, 36)
+font = pygame.font.Font(None, 72)
+safe = pygame.image.load("./assets/safe2.png").convert()
+safe = pygame.transform.scale(
+    safe, (constants.SQUARE_SIZE, constants.SQUARE_SIZE))
+unsafe = pygame.image.load("./assets/unsafe1.png").convert()
+unsafe = pygame.transform.scale(
+    unsafe, (constants.SQUARE_SIZE, constants.SQUARE_SIZE))
 
 s = socket.socket()
 try:
@@ -35,12 +41,11 @@ grid = [[True for _ in range(constants.GRID_SIZE)]
 def draw_grid():
     for row in range(constants.GRID_SIZE):
         for col in range(constants.GRID_SIZE):
-            color = constants.WHITE if grid[row][col] else constants.RED
-            pygame.draw.rect(screen, color,
-                             (col * constants.SQUARE_SIZE,  # posx
-                              row * constants.SQUARE_SIZE,  # posy
-                              constants.SQUARE_SIZE,   # width
-                              constants.SQUARE_SIZE))  # height
+            image = safe if grid[row][col] else unsafe
+            screen.blit(image,
+                        (col * constants.SQUARE_SIZE,  # posx
+                         row * constants.SQUARE_SIZE),  # posy
+                        )
 
 
 def send_data(clicked_row, clicked_col, key):
@@ -85,8 +90,10 @@ def update_grid(square_coord):
 
 def display_message(message):
     text = font.render(message, True, constants.BLACK)
-    screen.blit(text, (constants.WIDTH // 2 -
-                text.get_width() // 2, constants.HEIGHT // 4))
+    screen.blit(text, (
+        constants.WIDTH // 2 - text.get_width() // 2,
+        constants.HEIGHT // 2 - text.get_height() // 2
+    ))
 
 
 # Main game loop
