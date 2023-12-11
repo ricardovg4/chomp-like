@@ -1,0 +1,11 @@
+HOST = "localhost"
+PORT = 12345
+
+WIDTH, HEIGHT = 500, 500
+GRID_SIZE = 5
+SQUARE_SIZE = WIDTH // GRID_SIZE
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
