@@ -75,6 +75,8 @@ def receive():
             game_data["gameover"] = True
             if (deserialized_data["lost"] != game_data["player_id"]):
                 game_data["winner"] = True
+        if ("restart" in deserialized_data.keys()):
+            restart()
     except socket.error as msg:
         # print("Server couldn't connect", msg)
         pass
@@ -92,8 +94,41 @@ def display_message(message):
     text = font.render(message, True, constants.BLACK)
     screen.blit(text, (
         constants.WIDTH // 2 - text.get_width() // 2,
-        constants.HEIGHT // 2 - text.get_height() // 2
+        constants.HEIGHT // 2 - text.get_height() * 4
     ))
+
+
+def send_restart():
+    try:
+        serialized_data = pickle.dumps({"restart": True})
+        s.sendall(serialized_data)
+    except socket.error as msg:
+        pass
+
+
+def restart():
+    global grid
+    grid = [[True for _ in range(constants.GRID_SIZE)]
+            for _ in range(constants.GRID_SIZE)]
+    game_data["gameover"] = False
+    game_data["winner"] = False
+
+
+def button(message):
+    font = pygame.font.Font(None, 36)
+    width = 200
+    height = 50
+    button = pygame.Rect(constants.WIDTH / 2 - width/2,
+                         constants.HEIGHT / 2 - height/2,
+                         200, 50)
+
+    pygame.draw.rect(screen, constants.WHITE, button)
+
+    start_text = font.render(message, True, constants.BLACK)
+
+    screen.blit(start_text, (button.x + 50, button.y + 15))
+
+    return button
 
 
 # Main game loop
@@ -115,9 +150,15 @@ while running:
             if grid[clicked_row][clicked_col]:
                 send_data(clicked_row, clicked_col, "square_coord")
 
+            if (game_data["gameover"]):
+                restart_button = button("Restart")
+                if (restart_button.collidepoint(mouse_x, mouse_y)):
+                    send_restart()
+
     draw_grid()
 
     if (game_data["gameover"]):
+        button("Restart")
         if (game_data["winner"]):
             display_message("You won!")
         else:
