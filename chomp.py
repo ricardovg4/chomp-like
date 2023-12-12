@@ -67,6 +67,8 @@ def receive():
         data = s.recv(1024)
         deserialized_data = pickle.loads(data)
         print(deserialized_data)
+        if ("turn" in deserialized_data.keys()):
+            game_data["turn"] = deserialized_data["turn"]
         if ("square_coord" in deserialized_data.keys()):
             update_grid(deserialized_data["square_coord"])
         if ("player_id" in deserialized_data.keys()):
@@ -147,7 +149,8 @@ while running:
             clicked_row = mouse_y // constants.SQUARE_SIZE
 
             # Check if the clicked square is valid
-            if grid[clicked_row][clicked_col]:
+            if (game_data["turn"] == game_data["player_id"]
+                    and grid[clicked_row][clicked_col]):
                 send_data(clicked_row, clicked_col, "square_coord")
 
             if (game_data["gameover"]):

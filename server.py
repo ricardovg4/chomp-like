@@ -8,11 +8,19 @@ players = {
     "1": 0,
     "2": 0
 }
+turn = 1
 
 
 def handle_client(s, clients, addr):
-    player_number = list(players.keys())[list(players.values()).index(addr)]
-    s.sendall(pickle.dumps({"player_id": player_number}))
+    global turn
+    player_number = int(list(players.keys())[
+                        list(players.values()).index(addr)])
+    initial_data = {
+        "player_id": player_number,
+        "turn": turn,
+    }
+
+    s.sendall(pickle.dumps(initial_data))
 
     while True:
         data = s.recv(1024)
@@ -25,6 +33,9 @@ def handle_client(s, clients, addr):
             if ("square_coord" in deserialized_data.keys() and
                     deserialized_data["square_coord"] == [0, 0]):
                 deserialized_data.update({"lost": player_number})
+
+            turn = 1 if turn == 2 else 2
+            deserialized_data.update({"turn": turn})
 
             serialized_data = pickle.dumps(deserialized_data)
             broadcast_data(serialized_data, clients)
