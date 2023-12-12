@@ -1,4 +1,4 @@
-HOST = "localhost"
+HOST = "0.0.0.0"
 PORT = 12345
 
 WIDTH, HEIGHT = 500, 500
