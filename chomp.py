@@ -18,12 +18,20 @@ running = True
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 pygame.display.set_caption("Chomp")
 font = pygame.font.Font(None, 72)
-safe = pygame.image.load("./assets/safe2.png").convert()
+
+safe = pygame.image.load("./assets/safe.png").convert()
 safe = pygame.transform.scale(
     safe, (constants.SQUARE_SIZE, constants.SQUARE_SIZE))
-unsafe = pygame.image.load("./assets/unsafe1.png").convert()
+unsafe = pygame.image.load("./assets/unsafe.png").convert()
 unsafe = pygame.transform.scale(
     unsafe, (constants.SQUARE_SIZE, constants.SQUARE_SIZE))
+
+safeBright = pygame.image.load("./assets/safe_bright.png").convert()
+safeBright = pygame.transform.scale(
+    safeBright, (constants.SQUARE_SIZE, constants.SQUARE_SIZE))
+unsafeBright = pygame.image.load("./assets/unsafe_bright.png").convert()
+unsafeBright = pygame.transform.scale(
+    unsafeBright, (constants.SQUARE_SIZE, constants.SQUARE_SIZE))
 
 s = socket.socket()
 try:
@@ -42,6 +50,18 @@ def draw_grid():
     for row in range(constants.GRID_SIZE):
         for col in range(constants.GRID_SIZE):
             image = safe if grid[row][col] else unsafe
+
+            # get hovered position
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            hovered_row = mouse_y // constants.SQUARE_SIZE
+            hovered_col = mouse_x // constants.SQUARE_SIZE
+
+            if ([row, col] == [hovered_row, hovered_col]
+                    and grid[row][col]
+                    and [mouse_x, mouse_y] != [0, 0]
+                    and pygame.mouse.get_focused()):
+                image = safeBright
+
             screen.blit(image,
                         (col * constants.SQUARE_SIZE,  # posx
                          row * constants.SQUARE_SIZE),  # posy
@@ -93,7 +113,7 @@ def update_grid(square_coord):
 
 
 def display_message(message):
-    text = font.render(message, True, constants.BLACK)
+    text = font.render(message, True, constants.WHITE)
     screen.blit(text, (
         constants.WIDTH // 2 - text.get_width() // 2,
         constants.HEIGHT // 2 - text.get_height() * 4
