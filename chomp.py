@@ -22,6 +22,7 @@ font = pygame.font.Font(None, 72)
 safe = pygame.image.load("./assets/safe.png").convert()
 safe = pygame.transform.scale(
     safe, (constants.SQUARE_SIZE, constants.SQUARE_SIZE))
+
 unsafe = pygame.image.load("./assets/unsafe.png").convert()
 unsafe = pygame.transform.scale(
     unsafe, (constants.SQUARE_SIZE, constants.SQUARE_SIZE))
@@ -29,9 +30,16 @@ unsafe = pygame.transform.scale(
 safeBright = pygame.image.load("./assets/safe_bright.png").convert()
 safeBright = pygame.transform.scale(
     safeBright, (constants.SQUARE_SIZE, constants.SQUARE_SIZE))
+
 unsafeBright = pygame.image.load("./assets/unsafe_bright.png").convert()
 unsafeBright = pygame.transform.scale(
     unsafeBright, (constants.SQUARE_SIZE, constants.SQUARE_SIZE))
+
+white = pygame.image.load("./assets/Solid_white.png").convert()
+white = pygame.transform.scale(
+    white, (constants.SQUARE_SIZE, constants.SQUARE_SIZE))
+
+
 
 s = socket.socket()
 try:
@@ -49,7 +57,12 @@ grid = [[True for _ in range(constants.GRID_SIZE)]
 def draw_grid():
     for row in range(constants.GRID_SIZE):
         for col in range(constants.GRID_SIZE):
-            image = safe if grid[row][col] else unsafe
+            isSafe = True if [row, col] != [0, 0] else False
+            
+            if grid[row][col]:
+                image = safe if isSafe else unsafe
+            else:
+                image = white
 
             # get hovered position
             mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -60,7 +73,7 @@ def draw_grid():
                     and grid[row][col]
                     and [mouse_x, mouse_y] != [0, 0]
                     and pygame.mouse.get_focused()):
-                image = safeBright
+                image = safeBright if isSafe else unsafeBright
 
             screen.blit(image,
                         (col * constants.SQUARE_SIZE,  # posx
@@ -113,7 +126,7 @@ def update_grid(square_coord):
 
 
 def display_message(message):
-    text = font.render(message, True, constants.WHITE)
+    text = font.render(message, True, constants.BLACK)
     screen.blit(text, (
         constants.WIDTH // 2 - text.get_width() // 2,
         constants.HEIGHT // 2 - text.get_height() * 4
@@ -157,6 +170,13 @@ def button(message):
 while running:
     pygame.time.delay(10)
     receive()
+
+    if game_data["gameover"]:
+        pygame.display.set_caption("Chomp - Game over")
+    elif game_data["turn"] == game_data["player_id"]:
+        pygame.display.set_caption("Chomp - Your turn")
+    else:
+        pygame.display.set_caption("Chomp - Opponent's turn")
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

@@ -1,4 +1,4 @@
-HOST = "0.0.0.0"
+HOST = "127.0.0.1"
 PORT = 12345
 
 WIDTH, HEIGHT = 500, 500
